@@ -1,0 +1,3 @@
+MOBILE               Used to include code specific to Mobile builds. Opposite to the "DESKTOP" define in Desktop (SDL) builds.
+DEBUG                Used to include debug code. Not defined in Release builds.
+DEBUG_ASSERT_BREAK   If defined, when a debug assert fails, a breakpoint is triggered via code.

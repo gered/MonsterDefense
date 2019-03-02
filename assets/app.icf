@@ -1,0 +1,5 @@
+[S3E]
+DispFixRot = Landscape
+MemSize = 20971520
+IOSDispScaleFactor = 200
+SysGlesVersion = 2

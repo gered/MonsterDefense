@@ -1,0 +1,83 @@
+define MOBILE
+debug_define DEBUG
+debug_define DEBUG_ASSERT_BREAK
+
+files
+{
+	MonsterDefense.defines.txt
+
+(../lib/eastl) [lib/eastl] '*.*'
+(../lib/eastl/include/EABase) [lib/eastl/include/EABase] '*.*'
+(../lib/eastl/include/EABase/config) [lib/eastl/include/EABase/config] '*.*'
+(../lib/eastl/include/EASTL) [lib/eastl/include/EASTL] '*.*'
+(../lib/eastl/include/EASTL/bonus) [lib/eastl/include/EASTL/bonus] '*.*'
+(../lib/eastl/include/EASTL/internal) [lib/eastl/include/EASTL/internal] '*.*'
+(../lib/eastl/src) [lib/eastl/src] '*.*'
+(../lib/gwen) [lib/gwen] '*.*'
+(../lib/gwen/controls) [lib/gwen/controls] '*.*'
+(../lib/gwen/controls/layout) [lib/gwen/controls/layout] '*.*'
+(../lib/gwen/controls/property) [lib/gwen/controls/property] '*.*'
+(../lib/gwen/platforms) [lib/gwen/platforms] '*.*'
+(../lib/gwen/skins) [lib/gwen/skins] '*.*'
+(../lib/stb) [lib/stb] '*.*'
+(../lib/stl/include/stl) [lib/stl/include/stl] '*.*'
+(../lib/stl/include/stlconfig) [lib/stl/include/stlconfig] '*.*'
+(../src) [src] '*.*'
+(../src/contexts) [src/contexts] '*.*'
+(../src/effects) [src/effects] '*.*'
+(../src/entities) [src/entities] '*.*'
+(../src/entities/components) [src/entities/components] '*.*'
+(../src/events) [src/events] '*.*'
+(../src/framework) [src/framework] '*.*'
+(../src/framework/assets) [src/framework/assets] '*.*'
+(../src/framework/assets/animation) [src/framework/assets/animation] '*.*'
+(../src/framework/assets/static) [src/framework/assets/static] '*.*'
+(../src/framework/content) [src/framework/content] '*.*'
+(../src/framework/file) [src/framework/file] '*.*'
+(../src/framework/graphics) [src/framework/graphics] '*.*'
+(../src/framework/gwen) [src/framework/gwen] '*.*'
+(../src/framework/input) [src/framework/input] '*.*'
+(../src/framework/math) [src/framework/math] '*.*'
+(../src/framework/support) [src/framework/support] '*.*'
+(../src/framework/util) [src/framework/util] '*.*'
+(../src/game) [src/game] '*.*'
+(../src/game/cameras) [src/game/cameras] '*.*'
+(../src/game/entities) [src/game/entities] '*.*'
+(../src/game/entities/components) [src/game/entities/components] '*.*'
+(../src/game/entities/events) [src/game/entities/events] '*.*'
+(../src/game/entities/forces) [src/game/entities/forces] '*.*'
+(../src/game/entities/globalcomponents) [src/game/entities/globalcomponents] '*.*'
+(../src/game/entities/powerups) [src/game/entities/powerups] '*.*'
+(../src/game/entities/presets) [src/game/entities/presets] '*.*'
+(../src/game/entities/presets/bullets) [src/game/entities/presets/bullets] '*.*'
+(../src/game/entities/presets/monsters) [src/game/entities/presets/monsters] '*.*'
+(../src/game/entities/presets/objects) [src/game/entities/presets/objects] '*.*'
+(../src/game/entities/presets/particles) [src/game/entities/presets/particles] '*.*'
+(../src/game/entities/presets/powerups) [src/game/entities/presets/powerups] '*.*'
+(../src/game/entities/subsystems) [src/game/entities/subsystems] '*.*'
+(../src/game/entities/weapons) [src/game/entities/weapons] '*.*'
+(../src/game/events) [src/game/events] '*.*'
+(../src/game/gameplay) [src/game/gameplay] '*.*'
+(../src/game/levels) [src/game/levels] '*.*'
+(../src/graphics) [src/graphics] '*.*'
+(../src/input) [src/input] '*.*'
+(../src/processes) [src/processes] '*.*'
+(../src/states) [src/states] '*.*'
+(../src/tilemap) [src/tilemap] '*.*'
+}
+
+includepaths
+{
+	../lib/eastl/include
+	../lib/gwen
+	../lib/stb
+	../lib/stl/include
+}
+
+assets
+{
+	(../assets)
+	.
+}
+
+option s3e-data-dir=../assets

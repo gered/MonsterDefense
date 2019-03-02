@@ -1,0 +1,26 @@
+define MOBILE
+debug_define DEBUG
+debug_define DEBUG_ASSERT_BREAK
+
+files
+{
+	MonsterDefense.defines.txt
+
+	%%SOURCE_FILES%%	
+}
+
+includepaths
+{
+	../lib/eastl/include
+	../lib/gwen
+	../lib/stb
+	../lib/stl/include
+}
+
+assets
+{
+	(../assets)
+	.
+}
+
+option s3e-data-dir=../assets

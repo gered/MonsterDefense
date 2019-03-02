@@ -1,0 +1,205 @@
+#!/bin/bash
+
+# when executed via the OS X Finder, the working directory will likely not be
+# correct. this fixes that (working directory = directory this script is in)
+cd "$(dirname "$0")"
+
+
+
+#----- VARIABLES + CONFIG ------------------------------------------------------
+
+# shouldn't need to touch any of these 4 under normal circumstances ...
+#
+# NOTE: PROJECT_NAME is set assuming that the parent directory to the one that
+#       this script is contained in has a name that is suitable to be used for
+#       this "project name" value.
+#
+#       e.g. it assumes that this script is located at something like:
+#                /home/user/projects/PROJECT_NAME/marmalade/mkb_generate
+#                                    ^^^^^^^^^^^^
+#            and so PROJECT_NAME will be set accordingly.
+#
+PROJECT_NAME=$(pushd . > /dev/null; cd ..; basename $(pwd); popd > /dev/null)
+MKB_TEMPLATE=./mkb_template.txt
+MKB_OUTPUT_FILE=./$PROJECT_NAME.mkb
+TEMP_SOURCE_DIR_LIST_FILE=./temp_sources_list
+
+# list of directories (relative to this directory) to include in the MKB's
+# source directory listing. any subdirectories of the directories listed will
+# be included automatically
+DIR_SOURCES=( ../lib ../src )
+
+# list of directories that are contained in one of the directories listed in
+# DIR_SOURCES (e.g. a subdirectory somewhere in one of them) to be excluded
+# from the MKB's source directory listing. any subdirectories under these
+# excluded directories will also be excluded
+DIR_SOURCES_EXCLUDE=( ../lib/glew ../lib/sdl-osx )
+
+#-------------------------------------------------------------------------------
+
+
+
+#----- FUNCTIONS ---------------------------------------------------------------
+
+function isSourceDirExcluded()
+{
+	check_dir=$1
+	for i in "${DIR_SOURCES_EXCLUDE[@]}"
+	do
+		# check passed directory against each directory listed in the excludes list
+		# this just makes sure the beginning is the same (so sub dirs, etc. will still match)
+		if [[ $check_dir = $i* ]]; then
+			return 0
+		fi
+	done
+
+	return 1
+}
+
+function hasSources()
+{
+	check_dir=$1
+
+	# don't bother checking if the directory has sources if this directory
+	# is to be excluded...
+	if isSourceDirExcluded $check_dir; then
+		return 1
+	else
+		# it's not excluded, now we can check for source files
+		if [ `find $check_dir/*.cpp $check_dir/*.c $check_dir/*.h -type f -mindepth 0 2> /dev/null | wc -l` != 0 ]; then
+			return 0
+		else
+			return 1
+		fi
+	fi
+}
+
+function writeTempListOfSourceDirectories()
+{
+	# for each of the root source directories specified ...
+	for i in "${DIR_SOURCES[@]}"
+	do
+		# ... and then for each sub dir in this root source directory ...
+		find $i -type d | while read -r dir
+		do
+			# ... check if this sub dir has cpp/c/h files in it ...
+			if hasSources $dir; then
+				# ... and if so, write a line for it out to the temp file
+				# (this written line matches syntax appropriate for an MKB "files" section
+				# directory wildcard)
+				dir_name=${dir#../}                # strip "../" from the beginning
+				echo "($dir) [$dir_name] '*.*'" >> $TEMP_SOURCE_DIR_LIST_FILE
+			fi
+		done
+	done
+}
+
+function writeOutMkb()
+{
+	# this keeps tab characters in the lines we read
+	oldifs="$IFS"
+	IFS=""
+
+	# read each line from the MKB template and copy it to the output file
+	cat $MKB_TEMPLATE | while read template_line; do
+
+		############################################
+		# look for template placeholders
+		# (right now, we assume the template placeholders occur on a line all by themselves)
+
+		# source directory list
+		if [[ $template_line = *%%SOURCE_FILES%%* ]]; then
+			# read the previous generated temp source dir list file and copy it
+			# into the mkb output line by line as-is
+			cat $TEMP_SOURCE_DIR_LIST_FILE | while read source_dir_list_line; do
+				echo "$source_dir_list_line" >> $MKB_OUTPUT_FILE
+			done
+
+		############################################
+
+		# nothing special on this line, just copy it to the output as-is...
+		else
+			echo "$template_line" >> $MKB_OUTPUT_FILE
+		fi
+	done
+
+	# reset this when we're done
+	IFS="$oldifs"
+}
+
+#-------------------------------------------------------------------------------
+
+
+
+# ----- CONFIG AND FILE STATE SANITY CHECKING ----------------------------------
+
+# make sure some source directories were specified above
+if [ ${#DIR_SOURCES[@]} == 0 ]; then
+	echo "ERROR: No source directories specified."
+	exit 1
+fi
+
+# make sure each source directory exists
+for source_dir in "${DIR_SOURCES[@]}"
+do
+	if [ ! -d $source_dir ]; then
+		echo "ERROR: Source directory \"$source_dir\" does not exist."
+		exit 1
+	fi
+done
+
+# make sure each excluded source directory exists
+for excluded_source_dir in "${DIR_SOURCES_EXCLUDE[@]}"
+do
+	if [ ! -d $excluded_source_dir ]; then
+		echo "ERROR: Excluded source directory \"$excluded_source_dir\" does not exist."
+		exit 1
+	fi
+done
+
+# make sure MKB input template file exists
+if [ ! -f $MKB_TEMPLATE ]; then
+	echo "ERROR: MKB template file does not exist."
+	exit 1
+fi
+
+# if the temp source dir list file exists, delete it
+if [ -f $TEMP_SOURCE_DIR_LIST_FILE ]; then 
+	rm $TEMP_SOURCE_DIR_LIST_FILE
+fi
+
+# if the output MKB file exists, delete it
+if [ -f $MKB_OUTPUT_FILE ]; then
+	rm $MKB_OUTPUT_FILE
+fi
+
+
+
+#----- MAIN SCRIPT PROCESSING --------------------------------------------------
+
+writeTempListOfSourceDirectories
+
+if [ ! -f $TEMP_SOURCE_DIR_LIST_FILE ]; then
+	echo 'ERROR: Problem occurred while scanning for source file directories.'
+	exit 1
+fi
+
+writeOutMkb
+
+if [ ! -f $MKB_OUTPUT_FILE ]; then
+	echo 'ERROR: Problem occurred while writing out new MKB file.'
+	exit 1
+fi
+
+#-------------------------------------------------------------------------------
+
+
+
+#----- CLEANUP -----------------------------------------------------------------
+
+# if the temp source dir list file exists, delete it
+if [ -f $TEMP_SOURCE_DIR_LIST_FILE ]; then 
+	rm $TEMP_SOURCE_DIR_LIST_FILE
+fi
+
+#-------------------------------------------------------------------------------
